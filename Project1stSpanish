@@ -1,0 +1,350 @@
+#include <iostream>
+#include <string.h>
+#include <math.h>
+using namespace std;
+
+struct franja
+{
+    string idCurso;
+    int idSesion;
+    bool disponible=true;
+};
+
+struct dia
+{
+    franja franjaDia[4];
+};
+
+struct salon
+{
+    string nombreSalon;
+    int capacSalon;
+    char audioV;
+    dia diaF[5];
+};
+
+struct sesion
+{
+    int idSesion;
+    char diaS;
+    int franjaS;
+    int asistentes;
+    string salon="";
+};
+
+struct curso
+{
+    string idCurso;
+    string nombreCurso;
+    char reqAudiov;
+    int cantSesion;
+    sesion sesionCurso[10];
+};
+
+void introducir_datos(salon salones[],curso cursos[], int cantSalones, int cantCursos);
+void listar_datos_basicos_salones(salon salones[], int cantSalones);
+void listar_datos_basicos_cursos(curso cursos[], int cantCursos);
+void mostrar_grilla(salon salones[], curso cursos[], int cantSalones, int cantCursos);
+int asignacion_semanal_salones(salon salones[], curso cursos[], int cantSalones, int cantCursos);
+int salon_capacidad_adecuada(int i,int j,int cantSalones,salon salones[],curso cursos[]);
+void cancelar_sesion_curso(curso cursos[], int cantCursos);
+void extraer_datos_salon(int cantSalones, salon salones[]);
+void extraer_datos_curso(curso cursos[], int cantCursos);
+
+
+int main()
+{
+    int opcion, cantSalones, cantCursos;
+    salon salones[10];
+    curso cursos[10];
+
+    while(opcion!=11)
+    {
+        cout<<"0.\tINTRODUCIR DATOS POR PRIMERA VEZ. LEER Y ALMACENAR DATOS DE LOS SALONES Y DE LOS CURSOS"<<endl;
+        cout<<"1.\tLISTAR TODOS LOS DATOS BASICOS DE LOS SALONES"<<endl;
+        cout<<"2.\tLISTAR TODOS LOS DATOS BASICOS DE LOS CURSOS"<<endl;
+        cout<<"3.\tMOSTRAR LA GRILLA DE PROGRAMACION DE LOS SALONES PARA CADA DIA DE LA SEMANA, INDICANDO CURSOS PROGRAMADOS."<<endl;
+        cout<<"4.\tASIGNACI�N SEMANAL DE SALONES A CADA UNA DE LAS SESIONES"<<endl;
+        cout<<"5.\tCANCELAR LA SESION DE UN CURSO"<<endl;
+        cout<<"6.\tEXTRAER LOS DATOS COMPLETOS DE UN SALON DADO (Por nombre)"<<endl;
+        cout<<"7.\tEXTRAER LOS DATOS COMPLETOS DE UN CURSO DADO (Por ID)"<<endl;
+        cout<<"8.\tPRODUCIR ESTADISTICAS DE USO DE SALONES"<<endl;
+        cout<<"9.\tASIGNAR UN SALON INDIVIDUALA NUEVA SESION"<<endl;
+        cout<<"10.\tASIGNAR SALONES A UN CURSO NUEVO COMPLETO"<<endl;
+        cout<<"11.\tSALIR DEL PROGRAMA"<<endl;
+
+        cout<<"Digite la opcion que quiera realizar"<<endl;
+        cin>>opcion;
+
+        switch(opcion)
+        {
+        case 0:
+            cout<<"Digite la cantidad de salones: ";
+            cin>>cantSalones;
+            cout<<"Digite la cantidad de cursos: ";
+            cin>>cantCursos;
+            introducir_datos(salones,cursos,cantSalones,cantCursos);
+            break;
+
+        case 1:
+            listar_datos_basicos_salones(salones,cantSalones);
+            break;
+
+        case 2:
+            listar_datos_basicos_cursos(cursos,cantCursos);
+            break;
+
+        case 3:
+            mostrar_grilla(salones,cursos,cantSalones,cantCursos);
+            break;
+
+        case 4:
+            asignacion_semanal_salones(salones,cursos,cantSalones,cantCursos);
+            break;
+
+        case 5:
+            cancelar_sesion_curso(cursos,cantCursos);
+            break;
+
+        case 6:
+            extraer_datos_salon(cantSalones,salones);
+            break;
+
+        case 7:
+            extraer_datos_curso(cursos,cantCursos);
+            break;
+        case 11:
+            break;
+        }
+
+    }
+
+
+    return 0;
+}
+
+void introducir_datos(salon salones[], curso cursos[], int cantSalones, int cantCursos)
+{
+    for(int i=0; i<cantSalones; i++)
+    {
+        cout<<"Digite el nombre del salon:";
+        cin>>salones[i].nombreSalon;
+        cout<<"Digite la capacidad del salon:";
+        cin>>salones[i].capacSalon;
+        cout<<"Digite si el salon cuenta con ayudas audivisuales (s/n):";
+        cin>>salones[i].audioV;
+    }
+    for(int i=0; i<cantCursos; i++)
+    {
+        cout<<"Digite el id del curso:";
+        cin>>cursos[i].idCurso;
+        cout<<"Digite el nombre del curso:";
+        cin>>cursos[i].nombreCurso;
+        cout<<"El curso requiere ayudas audivisuales?(s/n):";
+        cin>>cursos[i].reqAudiov;
+        cout<<"Digite la cantidad de sesiones del curso:";
+        cin>>cursos[i].cantSesion;
+        for(int j=0; j<cursos[i].cantSesion; j++)
+        {
+            cout<<"Digite el id de la sesion:";
+            cin>>cursos[i].sesionCurso[j].idSesion;
+            cout<<"Dijite el dia de la sesion:";
+            cin>>cursos[i].sesionCurso[j].diaS;
+            cout<<"Digite la franja de la sesion:";
+            cin>>cursos[i].sesionCurso[j].franjaS;
+            cout<<"Digite la cantidad de asistentes para la sesion:";
+            cin>>cursos[i].sesionCurso[j].asistentes;
+
+        }
+    }
+
+}
+
+void listar_datos_basicos_salones(salon salones[], int cantSalones)
+{
+    for(int i=0; i<cantSalones; i++)
+    {
+        cout<<salones[i].nombreSalon<<endl;
+        cout<<salones[i].capacSalon<<endl;
+        cout<<salones[i].audioV<<endl;
+
+    }
+}
+
+void listar_datos_basicos_cursos(curso cursos[], int cantCursos)
+{
+
+    for(int i=0; i<cantCursos; i++)
+    {
+        cout<<cursos[i].idCurso;
+        cout<<cursos[i].nombreCurso;
+        cout<<cursos[i].reqAudiov;
+        cout<<cursos[i].cantSesion;
+        for(int j=0; j<cursos[i].cantSesion; j++)
+        {
+            cout<<cursos[i].sesionCurso[j].idSesion;
+            cout<<cursos[i].sesionCurso[j].diaS;
+            cout<<cursos[i].sesionCurso[j].franjaS;
+            cout<<cursos[i].sesionCurso[j].asistentes;
+
+        }
+    }
+}
+
+void mostrar_grilla(salon salones[], curso cursos[], int cantSalones, int cantCursos)
+{
+
+    cout<<"---------"<<"Lunes\t"<<"Martes\t"<<"Miercoles  "<<"Jueves  "<<"Viernes\t"<<endl;
+    for(int i=0;i<cantSalones;i++){
+        cout<<"Salon "<<i;
+        for(int j=0;j<5;j++)
+            for(int k=0;k<4;k++){
+            if(salones[i].diaF[j].franjaDia[k].disponible)
+               cout<<"Franja"<<k<<": "<<"libre  ";
+            else
+                cout<<"Franja"<<k<<": "<<"ocupada ";
+            }
+
+   }
+
+
+}
+
+int asignacion_semanal_salones(salon salones[], curso cursos[], int cantSalones, int cantCursos)
+{
+    int l=0,m=0,salonAdecuado;
+    for(int i=0; i<cantCursos; i++)
+    {
+        for(int j=0; j<cursos[i].cantSesion; j++)
+        {
+            salonAdecuado=salon_capacidad_adecuada(i,j,cantSalones,salones,cursos);
+            switch(cursos[i].sesionCurso[j].diaS)
+            {
+            case 'l':
+                if(salones[salonAdecuado].diaF[0].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible)
+                {
+                    salones[salonAdecuado].diaF[0].franjaDia[cursos[i].sesionCurso[j].franjaS].idSesion=cursos[i].sesionCurso[j].idSesion;
+                    salones[salonAdecuado].diaF[0].franjaDia[cursos[i].sesionCurso[j].franjaS].idCurso=cursos[i].idCurso;
+                    salones[salonAdecuado].diaF[0].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible=false;
+                }
+              
+                break;
+
+            case 'm':
+                if((salones[salonAdecuado].diaF[1].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible))
+                {
+                    salones[salonAdecuado].diaF[1].franjaDia[cursos[i].sesionCurso[j].franjaS].idSesion=cursos[i].sesionCurso[j].idSesion;
+                    salones[salonAdecuado].diaF[1].franjaDia[cursos[i].sesionCurso[j].franjaS].idCurso=cursos[i].idCurso;
+                    salones[salonAdecuado].diaF[1].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible=false;
+                }
+            case 'i':
+                if((salones[salonAdecuado].diaF[2].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible))
+                {
+                    salones[salonAdecuado].diaF[2].franjaDia[cursos[i].sesionCurso[j].franjaS].idSesion=cursos[i].sesionCurso[j].idSesion;
+                    salones[salonAdecuado].diaF[2].franjaDia[cursos[i].sesionCurso[j].franjaS].idCurso=cursos[i].idCurso;
+                    salones[salonAdecuado].diaF[2].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible=false;
+                }
+            case 'j':
+                if((salones[salonAdecuado].diaF[3].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible))
+                {
+                    salones[salonAdecuado].diaF[3].franjaDia[cursos[i].sesionCurso[j].franjaS].idSesion=cursos[i].sesionCurso[j].idSesion;
+                    salones[salonAdecuado].diaF[3].franjaDia[cursos[i].sesionCurso[j].franjaS].idCurso=cursos[i].idCurso;
+                    salones[salonAdecuado].diaF[3].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible=false;
+                }
+            case 'v':
+                if((salones[salonAdecuado].diaF[4].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible))
+                {
+                    salones[salonAdecuado].diaF[4].franjaDia[cursos[i].sesionCurso[j].franjaS].idSesion=cursos[i].sesionCurso[j].idSesion;
+                    salones[salonAdecuado].diaF[4].franjaDia[cursos[i].sesionCurso[j].franjaS].idCurso=cursos[i].idCurso;
+                    salones[salonAdecuado].diaF[4].franjaDia[cursos[i].sesionCurso[j].franjaS].disponible=false;
+
+                }
+
+            }
+        }
+    }
+
+
+}
+
+int salon_capacidad_adecuada(int i,int j, int cantSalones, salon salones[],curso cursos[])
+{
+    int mini=100,o=-1,res;
+    for(int k=0; k<cantSalones; k++)
+    {
+      res=abs((salones[k].capacSalon)-(cursos[i].sesionCurso[j].asistentes));
+
+        if((res)<mini)
+        {
+            mini=(salones[k].capacSalon)-(cursos[i].sesionCurso[j].asistentes);
+            o++;
+        }
+
+    }
+    return o;
+}
+
+void cancelar_sesion_curso(curso cursos[], int cantCursos){
+string cursoEliminar;
+int sesionEliminar;
+cout<<"Digite el id del curso que quiere cancelar";
+cin>>cursoEliminar;
+cout<<"Digite el id de la sesion del curso "<<cursoEliminar<<" que desea cancelar";;
+cin>>sesionEliminar;
+cout<<"La informacion de la sesion que desea cancelar es la siguiente";
+for(int i=0; i<cantCursos; i++)
+    {
+        if(cursos[i].idCurso==cursoEliminar){
+        cout<<cursos[i].idCurso;
+        cout<<cursos[i].nombreCurso; 
+        cout<<cursos[i].reqAudiov;
+        cout<<cursos[i].cantSesion;
+        for(int j=0; j<cursos[i].cantSesion; j++)
+        {
+            if(cursos[i].sesionCurso[j].idSesion==sesionEliminar){
+            cout<<cursos[i].sesionCurso[j].idSesion;
+            cout<<cursos[i].sesionCurso[j].diaS;
+            cout<<cursos[i].sesionCurso[j].franjaS;
+            cout<<cursos[i].sesionCurso[j].asistentes;
+            }
+        }
+        }
+    }
+
+}
+
+void extraer_datos_salon(int cantSalones, salon salones[]){
+string nombre;
+cout<<"Digite el nombre del salon";
+cin>>nombre;
+for(int i=0; i<cantSalones; i++)
+    { if(salones[i].nombreSalon.compare(nombre)==0){
+        cout<<salones[i].nombreSalon<<endl;
+        cout<<salones[i].capacSalon<<endl;
+        cout<<salones[i].audioV<<endl;
+     }
+    }
+}
+
+void extraer_datos_curso(curso cursos[], int cantCursos){
+string curso;
+cout<<"Digite el id del curso:";
+cin>>curso;
+for(int i=0; i<cantCursos; i++)
+    {
+        if(cursos[i].idCurso.compare(curso)==0){
+        cout<<cursos[i].idCurso;
+        cout<<cursos[i].nombreCurso;
+        cout<<cursos[i].reqAudiov;
+        cout<<cursos[i].cantSesion;
+        for(int j=0; j<cursos[i].cantSesion; j++)
+        {
+            cout<<cursos[i].sesionCurso[j].idSesion;
+            cout<<cursos[i].sesionCurso[j].diaS;
+            cout<<cursos[i].sesionCurso[j].franjaS;
+            cout<<cursos[i].sesionCurso[j].asistentes;
+
+        }
+        }
+    }
+}
